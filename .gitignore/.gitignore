@@ -1,0 +1,48 @@
+##Lectura de BD Siniestros, Polizas y afianzados
+Siniestros <- read.csv(file.choose(), sep=";")
+PyA <- read.csv(file.choose(), sep=";")
+head(Siniestros)
+
+###Organizar Bd Siniestros
+Siniestros$Tipo.Poliza <- as.integer(Siniestros$Tipo.Poliza)
+Siniestros$Tipo.Doc.afianzado <- as.integer(Siniestros$Tipo.Doc.afianzado)
+
+## 2 ES INCUMPLIMIENTO y 1 nada - variable causa siniestro
+Siniestros$Causa_Siniestro_Desc <- as.integer(Siniestros$Causa_Siniestro_Desc)
+factor(Siniestros$Causa_Siniestro_Desc)
+
+x <- length(Siniestros$Causa_Siniestro_Desc)
+Causa_Siniestro_Desc=c(0,x)
+for (i in 1:x)(
+  if(Siniestros$Causa_Siniestro_Desc[i]==4) Siniestros$Causa_Siniestro_Desc[i] <- 2
+  else Siniestros$Causa_Siniestro_Desc[i]<-Siniestros$Causa_Siniestro_Desc[i]
+)
+
+for (i in 1:x)(
+  if(Siniestros$Causa_Siniestro_Desc[i]==3) Siniestros$Causa_Siniestro_Desc[i] <- 1
+  else Siniestros$Causa_Siniestro_Desc[i]<-Siniestros$Causa_Siniestro_Desc[i]
+)
+
+##Categorizar la variable de Operacion Siniestro 1=Vacio, 2=Pago, 3=Reserva
+Siniestros$OperacionSiniestro <- as.integer(Siniestros$OperacionSiniestro)
+as.factor(Siniestros$OperacionSiniestro)
+
+##Creación nueva data con las variables necesarias
+Siniestros2 <- data.frame(Siniestros$Mes.iD,Siniestros$Documento.afianzado1,Siniestros$Numero_Poliza,Siniestros$Tipo.Poliza,Siniestros$Tipo.Doc.afianzado,Siniestros$Numero_Identificacion.tomador,Siniestros$Causa_Siniestro_Desc,Siniestros$OperacionSiniestro,Siniestros$X.Valor_Incurrido.)
+
+##Eliminar lo que no se incumplimiento
+I <- (which(Siniestros2$Siniestros.Causa_Siniestro_Desc==1))
+Siniestros2 <- Siniestros2[-I,]
+
+#Dejar solo los pagos
+Y <- (which(Siniestros2$Siniestros.OperacionSiniestro==2))
+Siniestros2 <-Siniestros2[Y,]
+
+##Borrar variables 
+Siniestros2 <- Siniestros2[,-7]
+Siniestros2 <- Siniestros2[,-7]
+Siniestros3 <- Siniestros2[-2]
+Siniestros3 <- Siniestros3[-5]
+##Correlacion
+plot(Siniestros2)
+t(apply(Siniestros2))
